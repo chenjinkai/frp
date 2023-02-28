@@ -31,7 +31,6 @@ test/bin/
 vendor/
 dist/
 .idea/
-.vscode/
 
 # Cache
 *.swp
