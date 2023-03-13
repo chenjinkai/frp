@@ -55,8 +55,8 @@ func NewTokenAuth(baseCfg BaseConfig, cfg TokenConfig) *TokenAuthSetterVerifier 
 
 func (auth *TokenAuthSetterVerifier) SetLogin(loginMsg *msg.Login) (err error) {
 	loginMsg.PrivilegeKey = util.GetAuthKey(auth.TokenConfig.Token, loginMsg.Timestamp)
-	loginMsg.Token = loginMsg.Token
-	loginMsg.AuthUser = loginMsg.AuthUser
+	loginMsg.Token = auth.TokenConfig.Token
+	loginMsg.AuthUser = auth.TokenConfig.AuthUser
 	return nil
 }
 
