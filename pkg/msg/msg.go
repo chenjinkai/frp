@@ -68,6 +68,8 @@ type Login struct {
 	Arch         string            `json:"arch,omitempty"`
 	User         string            `json:"user,omitempty"`
 	PrivilegeKey string            `json:"privilege_key,omitempty"`
+	AuthUser     string            `json:"auth_user,omitempty"`
+	Token        string            `json:"token,omitempty"`
 	Timestamp    int64             `json:"timestamp,omitempty"`
 	RunID        string            `json:"run_id,omitempty"`
 	Metas        map[string]string `json:"metas,omitempty"`
@@ -129,6 +131,8 @@ type NewWorkConn struct {
 	RunID        string `json:"run_id,omitempty"`
 	PrivilegeKey string `json:"privilege_key,omitempty"`
 	Timestamp    int64  `json:"timestamp,omitempty"`
+	Token        string `json:"token,omitempty"`
+	AuthUser     string `json:"authUser,omitempty"`
 }
 
 type ReqWorkConn struct{}
@@ -158,6 +162,8 @@ type NewVisitorConnResp struct {
 type Ping struct {
 	PrivilegeKey string `json:"privilege_key,omitempty"`
 	Timestamp    int64  `json:"timestamp,omitempty"`
+	Token        string `json:"token,omityempty"`
+	AuthUser     string `json:"authUser,omityempty"`
 }
 
 type Pong struct {

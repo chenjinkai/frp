@@ -26,30 +26,37 @@ type TokenConfig struct {
 	// Token specifies the authorization token used to create keys to be sent
 	// to the server. The server must have a matching token for authorization
 	// to succeed.  By default, this value is "".
-	Token string `ini:"token" json:"token"`
+	Token    string `ini:"token" json:"token"`
+	AuthUser string `ini:"auth_user" json:"authuser"`
 }
 
 func getDefaultTokenConf() TokenConfig {
 	return TokenConfig{
-		Token: "",
+		Token:    "",
+		AuthUser: "",
 	}
 }
 
 type TokenAuthSetterVerifier struct {
 	BaseConfig
 
-	token string
+	// token string
+
+	TokenConfig
 }
 
 func NewTokenAuth(baseCfg BaseConfig, cfg TokenConfig) *TokenAuthSetterVerifier {
 	return &TokenAuthSetterVerifier{
 		BaseConfig: baseCfg,
-		token:      cfg.Token,
+		// token:      cfg.Token,
+		TokenConfig: cfg,
 	}
 }
 
 func (auth *TokenAuthSetterVerifier) SetLogin(loginMsg *msg.Login) (err error) {
-	loginMsg.PrivilegeKey = util.GetAuthKey(auth.token, loginMsg.Timestamp)
+	loginMsg.PrivilegeKey = util.GetAuthKey(auth.TokenConfig.Token, loginMsg.Timestamp)
+	loginMsg.Token = loginMsg.Token
+	loginMsg.AuthUser = loginMsg.AuthUser
 	return nil
 }
 
@@ -59,7 +66,9 @@ func (auth *TokenAuthSetterVerifier) SetPing(pingMsg *msg.Ping) error {
 	}
 
 	pingMsg.Timestamp = time.Now().Unix()
-	pingMsg.PrivilegeKey = util.GetAuthKey(auth.token, pingMsg.Timestamp)
+	pingMsg.PrivilegeKey = util.GetAuthKey(auth.TokenConfig.Token, pingMsg.Timestamp)
+	pingMsg.Token = auth.TokenConfig.Token
+	pingMsg.AuthUser = auth.TokenConfig.AuthUser
 	return nil
 }
 
@@ -69,12 +78,14 @@ func (auth *TokenAuthSetterVerifier) SetNewWorkConn(newWorkConnMsg *msg.NewWorkC
 	}
 
 	newWorkConnMsg.Timestamp = time.Now().Unix()
-	newWorkConnMsg.PrivilegeKey = util.GetAuthKey(auth.token, newWorkConnMsg.Timestamp)
+	newWorkConnMsg.PrivilegeKey = util.GetAuthKey(auth.TokenConfig.Token, newWorkConnMsg.Timestamp)
+	newWorkConnMsg.Token = auth.TokenConfig.Token
+	newWorkConnMsg.AuthUser = auth.TokenConfig.AuthUser
 	return nil
 }
 
 func (auth *TokenAuthSetterVerifier) VerifyLogin(loginMsg *msg.Login) error {
-	if util.GetAuthKey(auth.token, loginMsg.Timestamp) != loginMsg.PrivilegeKey {
+	if util.GetAuthKey(auth.TokenConfig.Token, loginMsg.Timestamp) != loginMsg.PrivilegeKey {
 		return fmt.Errorf("token in login doesn't match token from configuration")
 	}
 	return nil
@@ -85,7 +96,7 @@ func (auth *TokenAuthSetterVerifier) VerifyPing(pingMsg *msg.Ping) error {
 		return nil
 	}
 
-	if util.GetAuthKey(auth.token, pingMsg.Timestamp) != pingMsg.PrivilegeKey {
+	if util.GetAuthKey(auth.TokenConfig.Token, pingMsg.Timestamp) != pingMsg.PrivilegeKey {
 		return fmt.Errorf("token in heartbeat doesn't match token from configuration")
 	}
 	return nil
@@ -96,7 +107,7 @@ func (auth *TokenAuthSetterVerifier) VerifyNewWorkConn(newWorkConnMsg *msg.NewWo
 		return nil
 	}
 
-	if util.GetAuthKey(auth.token, newWorkConnMsg.Timestamp) != newWorkConnMsg.PrivilegeKey {
+	if util.GetAuthKey(auth.TokenConfig.Token, newWorkConnMsg.Timestamp) != newWorkConnMsg.PrivilegeKey {
 		return fmt.Errorf("token in NewWorkConn doesn't match token from configuration")
 	}
 	return nil
