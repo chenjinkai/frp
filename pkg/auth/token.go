@@ -26,14 +26,18 @@ type TokenConfig struct {
 	// Token specifies the authorization token used to create keys to be sent
 	// to the server. The server must have a matching token for authorization
 	// to succeed.  By default, this value is "".
-	Token    string `ini:"token" json:"token"`
-	AuthUser string `ini:"auth_user" json:"authuser"`
+	Token     string `ini:"token" json:"token"`
+	AuthToken string `ini:"auth_token" json:"authToken"`
+	AuthUser  string `ini:"auth_user" json:"authuser"`
+	AuthUrl   string `ini:"auth_url" json:"authUrl"`
 }
 
 func getDefaultTokenConf() TokenConfig {
 	return TokenConfig{
-		Token:    "",
-		AuthUser: "",
+		Token:     "",
+		AuthToken: "",
+		AuthUser:  "",
+		AuthUrl:   "",
 	}
 }
 
@@ -55,7 +59,7 @@ func NewTokenAuth(baseCfg BaseConfig, cfg TokenConfig) *TokenAuthSetterVerifier 
 
 func (auth *TokenAuthSetterVerifier) SetLogin(loginMsg *msg.Login) (err error) {
 	loginMsg.PrivilegeKey = util.GetAuthKey(auth.TokenConfig.Token, loginMsg.Timestamp)
-	loginMsg.Token = auth.TokenConfig.Token
+	loginMsg.AuthToken = auth.TokenConfig.AuthToken
 	loginMsg.AuthUser = auth.TokenConfig.AuthUser
 	return nil
 }
@@ -67,7 +71,7 @@ func (auth *TokenAuthSetterVerifier) SetPing(pingMsg *msg.Ping) error {
 
 	pingMsg.Timestamp = time.Now().Unix()
 	pingMsg.PrivilegeKey = util.GetAuthKey(auth.TokenConfig.Token, pingMsg.Timestamp)
-	pingMsg.Token = auth.TokenConfig.Token
+	pingMsg.AuthToken = auth.TokenConfig.Token
 	pingMsg.AuthUser = auth.TokenConfig.AuthUser
 	return nil
 }
@@ -79,7 +83,7 @@ func (auth *TokenAuthSetterVerifier) SetNewWorkConn(newWorkConnMsg *msg.NewWorkC
 
 	newWorkConnMsg.Timestamp = time.Now().Unix()
 	newWorkConnMsg.PrivilegeKey = util.GetAuthKey(auth.TokenConfig.Token, newWorkConnMsg.Timestamp)
-	newWorkConnMsg.Token = auth.TokenConfig.Token
+	newWorkConnMsg.AuthToken = auth.TokenConfig.Token
 	newWorkConnMsg.AuthUser = auth.TokenConfig.AuthUser
 	return nil
 }
