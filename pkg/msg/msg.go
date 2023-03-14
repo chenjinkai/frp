@@ -163,7 +163,7 @@ type Ping struct {
 	PrivilegeKey string `json:"privilege_key,omitempty"`
 	Timestamp    int64  `json:"timestamp,omitempty"`
 	AuthToken    string `json:"auth_token,omitempty"`
-	AuthUser     string `json:"authUser,omityempty"`
+	AuthUser     string `json:"authUser,omitempty"`
 }
 
 type Pong struct {
@@ -198,4 +198,15 @@ type NatHoleClientDetectOK struct{}
 
 type NatHoleSid struct {
 	Sid string `json:"sid,omitempty"`
+}
+
+type CommonResponse struct {
+	Code int8   `json:"code,omitempty"`
+	Msg  string `json:"msg,omitempty"`
+	Data any    `json:"data,omitempty"`
+}
+
+type User struct {
+	Username string `json:"username,omitempty"`
+	Token    string `json:"Token,omitempty"`
 }

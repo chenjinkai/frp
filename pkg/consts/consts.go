@@ -33,9 +33,9 @@ var (
 	SUDPProxy   = "sudp"
 
 	// authentication method
-	TokenAuthMethod = "token"
-	OidcAuthMethod  = "oidc"
-
+	TokenAuthMethod     = "token"
+	OidcAuthMethod      = "oidc"
+	UserTokenAuthMethod = "userToken"
 	// TCP multiplexer
 	HTTPConnectTCPMultiplexer = "httpconnect"
 )
