@@ -115,7 +115,7 @@ func NewControl(
 }
 
 func (ctl *Control) Run() {
-	go ctl.worker()
+	go ctl.worker() //
 
 	// start all proxies
 	ctl.pm.Reload(ctl.pxyCfgs)

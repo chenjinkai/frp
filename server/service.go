@@ -120,7 +120,7 @@ func NewService(cfg config.ServerCommonConf) (svr *Service, err error) {
 			UDPPortManager: ports.NewManager("udp", cfg.ProxyBindAddr, cfg.AllowPorts),
 		},
 		httpVhostRouter: vhost.NewRouters(),
-		authVerifier:    auth.NewAuthVerifier(cfg.ServerConfig),
+		authVerifier:    auth.NewAuthVerifier(cfg.FrpAdminHost, cfg.ServerConfig),
 		tlsConfig:       tlsConfig,
 		cfg:             cfg,
 	}

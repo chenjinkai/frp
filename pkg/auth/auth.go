@@ -81,14 +81,14 @@ type Setter interface {
 	SetNewWorkConn(*msg.NewWorkConn) error
 }
 
-func NewAuthSetter(cfg ClientConfig) (authProvider Setter) {
+func NewAuthSetter(frpAdminHost string, cfg ClientConfig) (authProvider Setter) {
 	switch cfg.AuthenticationMethod {
 	case consts.TokenAuthMethod:
 		authProvider = NewTokenAuth(cfg.BaseConfig, cfg.TokenConfig)
 	case consts.OidcAuthMethod:
 		authProvider = NewOidcAuthSetter(cfg.BaseConfig, cfg.OidcClientConfig)
 	case consts.UserTokenAuthMethod:
-		authProvider = NewUserTokenAuthSetterVerifier(cfg.BaseConfig, cfg.UserTokenConfig)
+		authProvider = NewUserTokenAuthSetterVerifier(frpAdminHost, cfg.BaseConfig, cfg.UserTokenConfig)
 	default:
 		panic(fmt.Sprintf("wrong authentication method: '%s'", cfg.AuthenticationMethod))
 	}
@@ -102,14 +102,14 @@ type Verifier interface {
 	VerifyNewWorkConn(*msg.NewWorkConn) error
 }
 
-func NewAuthVerifier(cfg ServerConfig) (authVerifier Verifier) {
+func NewAuthVerifier(frpAdmin string, cfg ServerConfig) (authVerifier Verifier) {
 	switch cfg.AuthenticationMethod {
 	case consts.TokenAuthMethod:
 		authVerifier = NewTokenAuth(cfg.BaseConfig, cfg.TokenConfig)
 	case consts.OidcAuthMethod:
 		authVerifier = NewOidcAuthVerifier(cfg.BaseConfig, cfg.OidcServerConfig)
 	case consts.UserTokenAuthMethod:
-		authVerifier = NewUserTokenAuthSetterVerifier(cfg.BaseConfig, cfg.UserTokenConfig)
+		authVerifier = NewUserTokenAuthSetterVerifier(frpAdmin, cfg.BaseConfig, cfg.UserTokenConfig)
 	}
 
 	return authVerifier

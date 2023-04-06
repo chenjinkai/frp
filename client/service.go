@@ -91,7 +91,7 @@ func NewService(
 ) (svr *Service, err error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	svr = &Service{
-		authSetter:  auth.NewAuthSetter(cfg.ClientConfig),
+		authSetter:  auth.NewAuthSetter(cfg.FrpAdminHost, cfg.ClientConfig),
 		cfg:         cfg,
 		cfgFile:     cfgFile,
 		pxyCfgs:     pxyCfgs,
