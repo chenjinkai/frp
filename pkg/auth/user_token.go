@@ -120,7 +120,7 @@ func (auth *UserTokenAuthSetterVerifier) VerifyFromRemote(username, token string
 		}
 		resp, err := client.R().
 			SetResult(commonResp).
-			SetQueryString("username=" + username).
+			SetQueryString("username=" + username + "&token=" + token).
 			Get(auth.AuthUrl)
 
 		if err == nil && resp.RawResponse.StatusCode == 200 && commonResp.Code == 0 {
