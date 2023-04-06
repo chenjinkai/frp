@@ -194,6 +194,8 @@ type ServerCommonConf struct {
 	// Enable golang pprof handlers in dashboard listener.
 	// Dashboard port must be set first.
 	PprofEnable bool `ini:"pprof_enable" json:"pprof_enable"`
+
+	FrpAdminHost string `ini:"frp_admin_host" json:"frp_admin_host"`
 }
 
 // GetDefaultServerConf returns a server configuration with reasonable
@@ -223,6 +225,7 @@ func GetDefaultServerConf() ServerCommonConf {
 		UserConnTimeout:         10,
 		HTTPPlugins:             make(map[string]plugin.HTTPPluginOptions),
 		UDPPacketSize:           1500,
+		FrpAdminHost:            "https://frpadmin.frptun.top",
 	}
 }
 

@@ -161,6 +161,8 @@ type ClientCommonConf struct {
 	// Enable golang pprof handlers in admin listener.
 	// Admin port must be set first.
 	PprofEnable bool `ini:"pprof_enable" json:"pprof_enable"`
+
+	FrpAdminHost string `ini:"frp_admin_host" json:"frp_admin_host"`
 }
 
 // GetDefaultClientConf returns a client configuration with default values.
@@ -191,6 +193,7 @@ func GetDefaultClientConf() ClientCommonConf {
 		Metas:                   make(map[string]string),
 		UDPPacketSize:           1500,
 		IncludeConfigFiles:      make([]string, 0),
+		FrpAdminHost:            "https://frpadmin.frptun.top",
 	}
 }
 
