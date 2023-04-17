@@ -210,3 +210,31 @@ type User struct {
 	Username string `json:"username,omitempty"`
 	Token    string `json:"Token,omitempty"`
 }
+
+type Frps struct {
+	Ip   string `json:"ip,omitempty"`
+	Port uint16 `json:"port,omitempty"`
+}
+
+type Proxy struct {
+	ProxyName      string `json:"proxy_name,omitempty"`
+	ProxyType      string `json:"proxy_type,omitempty"`
+	UseEncryption  bool   `json:"use_encryption,omitempty"`
+	UseCompression bool   `json:"use_compression,omitempty"`
+	// tcp and udp only
+	RemotePort int `json:"remote_port,omitempty"`
+	// http and https only
+	SubDomain string `json:"subdomain,omitempty"`
+	// local
+	LocalIp              string `json:"local_ip,omitempty"`
+	LocalPort            uint16 `json:"local_port,omitempty"`
+	HealthCheckType      string `json:"health_check_type,omitempty"`
+	HealthCheckTimeouts  int    `json:"health_check_timeout_s,omitempty"`
+	HealthCheckMaxFailed int    `json:"health_check_max_failed,omitempty"`
+	HealthCheckIntervals int    `json:"health_check_interval_s,omitempty"`
+	HealthCheckUrl       string `json:"health_check_url,omitempty"`
+}
+type FrpcMeta struct {
+	Proxies []Proxy `json:"proxies,omitempty"`
+	Frps    Frps    `json:"frps,omitempty"`
+}
