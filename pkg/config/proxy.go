@@ -54,6 +54,7 @@ type ProxyConf interface {
 	GetBaseInfo() *BaseProxyConf
 	UnmarshalFromMsg(*msg.NewProxy)
 	UnmarshalFromIni(string, string, *ini.Section) error
+	UnmarshalFromAdmin(string, string) error
 	MarshalToMsg(*msg.NewProxy)
 	CheckForCli() error
 	CheckForSvr(ServerCommonConf) error
@@ -567,6 +568,10 @@ func (cfg *TCPProxyConf) UnmarshalFromIni(prefix string, name string, section *i
 	return nil
 }
 
+func (cfg *TCPProxyConf) UnmarshalFromAdmin(username string, token string) error {
+	return nil
+}
+
 func (cfg *TCPProxyConf) MarshalToMsg(pMsg *msg.NewProxy) {
 	cfg.BaseProxyConf.marshalToMsg(pMsg)
 
@@ -622,6 +627,10 @@ func (cfg *TCPMuxProxyConf) UnmarshalFromIni(prefix string, name string, section
 
 	// Add custom logic unmarshal if exists
 
+	return nil
+}
+
+func (cfg *TCPMuxProxyConf) UnmarshalFromAdmin(username string, token string) error {
 	return nil
 }
 
@@ -713,6 +722,10 @@ func (cfg *UDPProxyConf) UnmarshalFromIni(prefix string, name string, section *i
 	return nil
 }
 
+func (cfg *UDPProxyConf) UnmarshalFromAdmin(username string, token string) error {
+	return nil
+}
+
 func (cfg *UDPProxyConf) UnmarshalFromMsg(pMsg *msg.NewProxy) {
 	cfg.BaseProxyConf.unmarshalFromMsg(pMsg)
 
@@ -781,6 +794,10 @@ func (cfg *HTTPProxyConf) UnmarshalFromIni(prefix string, name string, section *
 	// Add custom logic unmarshal if exists
 	cfg.Headers = GetMapWithoutPrefix(section.KeysHash(), "header_")
 
+	return nil
+}
+
+func (cfg *HTTPProxyConf) UnmarshalFromAdmin(username string, token string) error {
 	return nil
 }
 
@@ -872,6 +889,10 @@ func (cfg *HTTPSProxyConf) UnmarshalFromIni(prefix string, name string, section 
 	return nil
 }
 
+func (cfg *HTTPSProxyConf) UnmarshalFromAdmin(username string, token string) error {
+	return nil
+}
+
 func (cfg *HTTPSProxyConf) UnmarshalFromMsg(pMsg *msg.NewProxy) {
 	cfg.BaseProxyConf.unmarshalFromMsg(pMsg)
 
@@ -949,6 +970,10 @@ func (cfg *SUDPProxyConf) UnmarshalFromIni(prefix string, name string, section *
 	return nil
 }
 
+func (cfg *SUDPProxyConf) UnmarshalFromAdmin(username string, token string) error {
+	return nil
+}
+
 // Only for role server.
 func (cfg *SUDPProxyConf) UnmarshalFromMsg(pMsg *msg.NewProxy) {
 	cfg.BaseProxyConf.unmarshalFromMsg(pMsg)
@@ -1018,6 +1043,10 @@ func (cfg *STCPProxyConf) UnmarshalFromIni(prefix string, name string, section *
 	return nil
 }
 
+func (cfg *STCPProxyConf) UnmarshalFromAdmin(username string, token string) error {
+	return nil
+}
+
 // Only for role server.
 func (cfg *STCPProxyConf) UnmarshalFromMsg(pMsg *msg.NewProxy) {
 	cfg.BaseProxyConf.unmarshalFromMsg(pMsg)
@@ -1084,6 +1113,10 @@ func (cfg *XTCPProxyConf) UnmarshalFromIni(prefix string, name string, section *
 		cfg.Role = "server"
 	}
 
+	return nil
+}
+
+func (cfg *XTCPProxyConf) UnmarshalFromAdmin(username string, token string) error {
 	return nil
 }
 
