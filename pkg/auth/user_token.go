@@ -104,12 +104,9 @@ func (auth *UserTokenAuthSetterVerifier) VerifyFromRemote(frpadminHost, username
 	client := resty.New()
 	client.SetRetryCount(3).
 		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}).
-		// SetScheme("https").
 		SetBaseURL(frpadminHost).
-		SetRetryWaitTime(5 * time.Second).
-		SetRetryMaxWaitTime(20 * time.Second).
 		SetRetryAfter(func(client *resty.Client, resp *resty.Response) (time.Duration, error) {
-			return 0, errors.New("failed to get user toke, status:" + resp.Status() + ", body:" + resp.String())
+			return 0, errors.New("failed to get user token, status:" + resp.Status() + ", body:" + resp.String())
 		})
 
 	commonResp := &msg.CommonResponse{}
@@ -118,9 +115,9 @@ func (auth *UserTokenAuthSetterVerifier) VerifyFromRemote(frpadminHost, username
 		SetQueryString("username=" + username + "&token=" + token).
 		Get(auth.AuthUrl)
 
-	if err == nil && resp.RawResponse.StatusCode == 200 && commonResp.Code == 0 {
-		return true, nil
+	if err == nil {
+		return resp.RawResponse.StatusCode == 200 && commonResp.Code == 0, nil
 	} else {
-		return false, fmt.Errorf("user token in NewWorkConn doesn't match user token from configuration")
+		return false, fmt.Errorf("user token in NewWorkConn doesn't match user token from configuration: %w", err)
 	}
 }

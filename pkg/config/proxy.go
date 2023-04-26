@@ -15,16 +15,20 @@
 package config
 
 import (
+	"crypto/tls"
+	"errors"
 	"fmt"
 	"net"
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"gopkg.in/ini.v1"
 
 	"github.com/fatedier/frp/pkg/consts"
 	"github.com/fatedier/frp/pkg/msg"
+	"github.com/go-resty/resty/v2"
 )
 
 // Proxy
@@ -54,7 +58,7 @@ type ProxyConf interface {
 	GetBaseInfo() *BaseProxyConf
 	UnmarshalFromMsg(*msg.NewProxy)
 	UnmarshalFromIni(string, string, *ini.Section) error
-	UnmarshalFromAdmin(string, string) error
+	UnmarshalFromAdmin(proxies msg.Proxy)
 	MarshalToMsg(*msg.NewProxy)
 	CheckForCli() error
 	CheckForSvr(ServerCommonConf) error
@@ -568,8 +572,47 @@ func (cfg *TCPProxyConf) UnmarshalFromIni(prefix string, name string, section *i
 	return nil
 }
 
-func (cfg *TCPProxyConf) UnmarshalFromAdmin(username string, token string) error {
-	return nil
+func GetFrpcMetaFromAdmin(adminHost, username, token string) (msg.FrpcMeta, error) {
+	client := resty.New()
+	client.SetRetryCount(3).
+		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}).
+		SetBaseURL(adminHost).
+		SetRetryAfter(func(client *resty.Client, resp *resty.Response) (time.Duration, error) {
+			return 0, errors.New("failed to get user toke, status:" + resp.Status() + ", body:" + resp.String())
+		})
+
+	result := &msg.FrpcMeta{}
+	commonResp := &msg.CommonResponse{Data: result}
+	resp, err := client.R().
+		SetResult(commonResp).
+		SetQueryString("username=" + username + "&token=" + token).
+		Get("/clients/frpcmeta")
+
+	if err == nil && resp.RawResponse.StatusCode == 200 && commonResp.Code == 0 {
+		return commonResp.Data.(msg.FrpcMeta), nil
+	} else {
+		return *result, fmt.Errorf("failed to get frpcmeta: %w", err)
+	}
+}
+
+func fillBaseProxyConf(cfg *BaseProxyConf, proxy msg.Proxy) {
+	cfg.ProxyName = proxy.ProxyName
+	cfg.ProxyType = proxy.ProxyType
+	cfg.UseEncryption = proxy.UseEncryption
+	cfg.UseCompression = proxy.UseCompression
+
+	cfg.LocalIP = proxy.LocalIp
+	cfg.LocalPort = proxy.LocalPort
+
+	cfg.HealthCheckIntervalS = proxy.HealthCheckIntervals
+	cfg.HealthCheckMaxFailed = proxy.HealthCheckMaxFailed
+	cfg.HealthCheckTimeoutS = proxy.HealthCheckTimeouts
+	cfg.HealthCheckType = proxy.HealthCheckType
+}
+
+func (cfg *TCPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
+	fillBaseProxyConf(&cfg.BaseProxyConf, proxy)
+	cfg.RemotePort = proxy.RemotePort
 }
 
 func (cfg *TCPProxyConf) MarshalToMsg(pMsg *msg.NewProxy) {
@@ -630,8 +673,8 @@ func (cfg *TCPMuxProxyConf) UnmarshalFromIni(prefix string, name string, section
 	return nil
 }
 
-func (cfg *TCPMuxProxyConf) UnmarshalFromAdmin(username string, token string) error {
-	return nil
+func (cfg *TCPMuxProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
+
 }
 
 func (cfg *TCPMuxProxyConf) UnmarshalFromMsg(pMsg *msg.NewProxy) {
@@ -722,7 +765,9 @@ func (cfg *UDPProxyConf) UnmarshalFromIni(prefix string, name string, section *i
 	return nil
 }
 
-func (cfg *UDPProxyConf) UnmarshalFromAdmin(username string, token string) error {
+func (cfg *UDPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) error {
+	fillBaseProxyConf(&cfg.BaseProxyConf, proxy)
+	cfg.RemotePort = proxy.RemotePort
 	return nil
 }
 
@@ -797,7 +842,8 @@ func (cfg *HTTPProxyConf) UnmarshalFromIni(prefix string, name string, section *
 	return nil
 }
 
-func (cfg *HTTPProxyConf) UnmarshalFromAdmin(username string, token string) error {
+func (cfg *HTTPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) error {
+	fillBaseProxyConf(&cfg.BaseProxyConf, proxy)
 	return nil
 }
 
@@ -889,7 +935,8 @@ func (cfg *HTTPSProxyConf) UnmarshalFromIni(prefix string, name string, section 
 	return nil
 }
 
-func (cfg *HTTPSProxyConf) UnmarshalFromAdmin(username string, token string) error {
+func (cfg *HTTPSProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) error {
+	fillBaseProxyConf(&cfg.BaseProxyConf, proxy)
 	return nil
 }
 

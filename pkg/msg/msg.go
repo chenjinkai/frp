@@ -223,11 +223,9 @@ type Proxy struct {
 	UseCompression bool   `json:"use_compression,omitempty"`
 	// tcp and udp only
 	RemotePort int `json:"remote_port,omitempty"`
-	// http and https only
-	SubDomain string `json:"subdomain,omitempty"`
 	// local
 	LocalIp              string `json:"local_ip,omitempty"`
-	LocalPort            uint16 `json:"local_port,omitempty"`
+	LocalPort            int    `json:"local_port,omitempty"`
 	HealthCheckType      string `json:"health_check_type,omitempty"`
 	HealthCheckTimeouts  int    `json:"health_check_timeout_s,omitempty"`
 	HealthCheckMaxFailed int    `json:"health_check_max_failed,omitempty"`
