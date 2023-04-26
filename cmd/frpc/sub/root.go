@@ -192,11 +192,21 @@ func parseClientCommonCfgFromCmd() (cfg config.ClientCommonConf, err error) {
 }
 
 func runClient(cfgFilePath string) error {
-	cfg, pxyCfgs, visitorCfgs, err := config.ParseClientConfig(cfgFilePath)
+	cfg, _, visitorCfgs, err := config.ParseClientConfig(cfgFilePath)
 	if err != nil {
 		return err
 	}
-	return startService(cfg, pxyCfgs, visitorCfgs, cfgFilePath)
+	frpcMeta, err := config.GetFrpcMetaFromAdmin(cfg.FrpAdminHost, cfg.AuthUser, cfg.AuthToken)
+	if err != nil {
+		return err
+	}
+	remoteProxiesConfig := make(map[string]config.ProxyConf)
+	for _, proxy := range frpcMeta.Proxies {
+		proxyConf := config.DefaultProxyConf(proxy.ProxyType)
+		proxyConf.UnmarshalFromAdmin(cfg, proxy)
+		remoteProxiesConfig[proxyName] = proxyConf
+	}
+	return startService(cfg, remoteProxiesConfig, visitorCfgs, cfgFilePath)
 }
 
 func startService(

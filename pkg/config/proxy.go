@@ -58,7 +58,7 @@ type ProxyConf interface {
 	GetBaseInfo() *BaseProxyConf
 	UnmarshalFromMsg(*msg.NewProxy)
 	UnmarshalFromIni(string, string, *ini.Section) error
-	UnmarshalFromAdmin(proxies msg.Proxy)
+	UnmarshalFromAdmin(clientCommonConf ClientCommonConf, proxy msg.Proxy)
 	MarshalToMsg(*msg.NewProxy)
 	CheckForCli() error
 	CheckForSvr(ServerCommonConf) error
@@ -610,7 +610,7 @@ func fillBaseProxyConf(cfg *BaseProxyConf, proxy msg.Proxy) {
 	cfg.HealthCheckType = proxy.HealthCheckType
 }
 
-func (cfg *TCPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
+func (cfg *TCPProxyConf) UnmarshalFromAdmin(clientCommonConf ClientCommonConf, proxy msg.Proxy) {
 	fillBaseProxyConf(&cfg.BaseProxyConf, proxy)
 	cfg.RemotePort = proxy.RemotePort
 }
@@ -673,7 +673,7 @@ func (cfg *TCPMuxProxyConf) UnmarshalFromIni(prefix string, name string, section
 	return nil
 }
 
-func (cfg *TCPMuxProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
+func (cfg *TCPMuxProxyConf) UnmarshalFromAdmin(clientCommonConf ClientCommonConf, proxy msg.Proxy) {
 
 }
 
@@ -765,7 +765,7 @@ func (cfg *UDPProxyConf) UnmarshalFromIni(prefix string, name string, section *i
 	return nil
 }
 
-func (cfg *UDPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
+func (cfg *UDPProxyConf) UnmarshalFromAdmin(clientCommonConf ClientCommonConf, proxy msg.Proxy) {
 	fillBaseProxyConf(&cfg.BaseProxyConf, proxy)
 	cfg.RemotePort = proxy.RemotePort
 }
@@ -841,8 +841,9 @@ func (cfg *HTTPProxyConf) UnmarshalFromIni(prefix string, name string, section *
 	return nil
 }
 
-func (cfg *HTTPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
+func (cfg *HTTPProxyConf) UnmarshalFromAdmin(clientCommonConf ClientCommonConf, proxy msg.Proxy) {
 	fillBaseProxyConf(&cfg.BaseProxyConf, proxy)
+	cfg.SubDomain = clientCommonConf.AuthUser
 }
 
 func (cfg *HTTPProxyConf) UnmarshalFromMsg(pMsg *msg.NewProxy) {
@@ -933,8 +934,9 @@ func (cfg *HTTPSProxyConf) UnmarshalFromIni(prefix string, name string, section 
 	return nil
 }
 
-func (cfg *HTTPSProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
+func (cfg *HTTPSProxyConf) UnmarshalFromAdmin(clientCommonConf ClientCommonConf, proxy msg.Proxy) {
 	fillBaseProxyConf(&cfg.BaseProxyConf, proxy)
+	cfg.SubDomain = clientCommonConf.AuthUser
 }
 
 func (cfg *HTTPSProxyConf) UnmarshalFromMsg(pMsg *msg.NewProxy) {
@@ -1014,7 +1016,7 @@ func (cfg *SUDPProxyConf) UnmarshalFromIni(prefix string, name string, section *
 	return nil
 }
 
-func (cfg *SUDPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
+func (cfg *SUDPProxyConf) UnmarshalFromAdmin(clientCommonConf ClientCommonConf, proxy msg.Proxy) {
 
 }
 
@@ -1087,7 +1089,7 @@ func (cfg *STCPProxyConf) UnmarshalFromIni(prefix string, name string, section *
 	return nil
 }
 
-func (cfg *STCPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
+func (cfg *STCPProxyConf) UnmarshalFromAdmin(clientCommonConf ClientCommonConf, proxy msg.Proxy) {
 
 }
 
@@ -1160,7 +1162,7 @@ func (cfg *XTCPProxyConf) UnmarshalFromIni(prefix string, name string, section *
 	return nil
 }
 
-func (cfg *XTCPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
+func (cfg *XTCPProxyConf) UnmarshalFromAdmin(clientCommonConf ClientCommonConf, proxy msg.Proxy) {
 
 }
 
