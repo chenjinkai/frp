@@ -765,10 +765,9 @@ func (cfg *UDPProxyConf) UnmarshalFromIni(prefix string, name string, section *i
 	return nil
 }
 
-func (cfg *UDPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) error {
+func (cfg *UDPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
 	fillBaseProxyConf(&cfg.BaseProxyConf, proxy)
 	cfg.RemotePort = proxy.RemotePort
-	return nil
 }
 
 func (cfg *UDPProxyConf) UnmarshalFromMsg(pMsg *msg.NewProxy) {
@@ -842,9 +841,8 @@ func (cfg *HTTPProxyConf) UnmarshalFromIni(prefix string, name string, section *
 	return nil
 }
 
-func (cfg *HTTPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) error {
+func (cfg *HTTPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
 	fillBaseProxyConf(&cfg.BaseProxyConf, proxy)
-	return nil
 }
 
 func (cfg *HTTPProxyConf) UnmarshalFromMsg(pMsg *msg.NewProxy) {
@@ -935,9 +933,8 @@ func (cfg *HTTPSProxyConf) UnmarshalFromIni(prefix string, name string, section 
 	return nil
 }
 
-func (cfg *HTTPSProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) error {
+func (cfg *HTTPSProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
 	fillBaseProxyConf(&cfg.BaseProxyConf, proxy)
-	return nil
 }
 
 func (cfg *HTTPSProxyConf) UnmarshalFromMsg(pMsg *msg.NewProxy) {
@@ -1017,8 +1014,8 @@ func (cfg *SUDPProxyConf) UnmarshalFromIni(prefix string, name string, section *
 	return nil
 }
 
-func (cfg *SUDPProxyConf) UnmarshalFromAdmin(username string, token string) error {
-	return nil
+func (cfg *SUDPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
+
 }
 
 // Only for role server.
@@ -1090,8 +1087,8 @@ func (cfg *STCPProxyConf) UnmarshalFromIni(prefix string, name string, section *
 	return nil
 }
 
-func (cfg *STCPProxyConf) UnmarshalFromAdmin(username string, token string) error {
-	return nil
+func (cfg *STCPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
+
 }
 
 // Only for role server.
@@ -1163,8 +1160,8 @@ func (cfg *XTCPProxyConf) UnmarshalFromIni(prefix string, name string, section *
 	return nil
 }
 
-func (cfg *XTCPProxyConf) UnmarshalFromAdmin(username string, token string) error {
-	return nil
+func (cfg *XTCPProxyConf) UnmarshalFromAdmin(proxy msg.Proxy) {
+
 }
 
 // Only for role server.
