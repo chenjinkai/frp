@@ -589,7 +589,7 @@ func GetFrpcMetaFromAdmin(adminHost, username, token string) (msg.FrpcMeta, erro
 		Get("/clients/frpcmeta")
 
 	if err == nil && resp.RawResponse.StatusCode == 200 && commonResp.Code == 0 {
-		return commonResp.Data.(msg.FrpcMeta), nil
+		return *result, nil
 	} else {
 		return *result, fmt.Errorf("failed to get frpcmeta: %w", err)
 	}
