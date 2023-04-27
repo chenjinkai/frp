@@ -191,20 +191,28 @@ func parseClientCommonCfgFromCmd() (cfg config.ClientCommonConf, err error) {
 	return
 }
 
-func runClient(cfgFilePath string) error {
-	cfg, _, visitorCfgs, err := config.ParseClientConfig(cfgFilePath)
-	if err != nil {
-		return err
-	}
+func getProxiesFromAdmin(cfg config.ClientCommonConf) (map[string]config.ProxyConf, error) {
 	frpcMeta, err := config.GetFrpcMetaFromAdmin(cfg.FrpAdminHost, cfg.AuthUser, cfg.AuthToken)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	remoteProxiesConfig := make(map[string]config.ProxyConf)
 	for _, proxy := range frpcMeta.Proxies {
 		proxyConf := config.DefaultProxyConf(proxy.ProxyType)
 		proxyConf.UnmarshalFromAdmin(cfg, proxy)
 		remoteProxiesConfig[proxyName] = proxyConf
+	}
+	return remoteProxiesConfig, nil
+}
+
+func runClient(cfgFilePath string) error {
+	cfg, _, visitorCfgs, err := config.ParseClientConfig(cfgFilePath)
+	if err != nil {
+		return err
+	}
+	remoteProxiesConfig, err := getProxiesFromAdmin(cfg)
+	if err != nil {
+		return err
 	}
 	return startService(cfg, remoteProxiesConfig, visitorCfgs, cfgFilePath)
 }
@@ -236,6 +244,18 @@ func startService(
 	}
 
 	err = svr.Run()
+
+	ticker := time.NewTicker(5 * time.Second)
+	for range ticker.C {
+		go func() {
+			remoteProxiesConfig, err := getProxiesFromAdmin(cfg)
+			if err != nil {
+				fmt.Println(err)
+			}
+			svr.ReloadConf(remoteProxiesConfig, visitorCfgs)
+		}()
+	}
+
 	if err == nil && shouldGracefulClose {
 		<-closedDoneCh
 	}

@@ -608,6 +608,7 @@ func fillBaseProxyConf(cfg *BaseProxyConf, proxy msg.Proxy) {
 	cfg.HealthCheckMaxFailed = proxy.HealthCheckMaxFailed
 	cfg.HealthCheckTimeoutS = proxy.HealthCheckTimeouts
 	cfg.HealthCheckType = proxy.HealthCheckType
+	cfg.HealthCheckURL = proxy.HealthCheckType + "://" + proxy.LocalIp + ":" + strconv.Itoa(proxy.LocalPort) + proxy.HealthCheckUrl
 }
 
 func (cfg *TCPProxyConf) UnmarshalFromAdmin(clientCommonConf ClientCommonConf, proxy msg.Proxy) {
