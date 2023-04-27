@@ -213,7 +213,7 @@ type User struct {
 
 type Frps struct {
 	Ip   string `json:"ip,omitempty"`
-	Port uint16 `json:"port,omitempty"`
+	Port int    `json:"port,omitempty"`
 }
 
 type Proxy struct {

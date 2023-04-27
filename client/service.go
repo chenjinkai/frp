@@ -109,7 +109,7 @@ func (svr *Service) GetController() *Control {
 	return svr.ctl
 }
 
-func (svr *Service) Run() error {
+func (svr *Service) Run(wg *sync.WaitGroup) error {
 	xl := xlog.FromContextSafe(svr.ctx)
 
 	// set custom DNSServer
@@ -163,6 +163,7 @@ func (svr *Service) Run() error {
 		}
 		log.Info("admin server listen on %s:%d", svr.cfg.AdminAddr, svr.cfg.AdminPort)
 	}
+	wg.Done()
 	<-svr.ctx.Done()
 	return nil
 }

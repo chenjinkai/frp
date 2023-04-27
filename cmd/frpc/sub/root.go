@@ -31,6 +31,7 @@ import (
 	"github.com/fatedier/frp/client"
 	"github.com/fatedier/frp/pkg/auth"
 	"github.com/fatedier/frp/pkg/config"
+	"github.com/fatedier/frp/pkg/msg"
 	"github.com/fatedier/frp/pkg/util/log"
 	"github.com/fatedier/frp/pkg/util/version"
 )
@@ -191,10 +192,10 @@ func parseClientCommonCfgFromCmd() (cfg config.ClientCommonConf, err error) {
 	return
 }
 
-func getProxiesFromAdmin(cfg config.ClientCommonConf) (map[string]config.ProxyConf, error) {
+func getProxiesFromAdmin(cfg config.ClientCommonConf) (map[string]config.ProxyConf, msg.FrpcMeta, error) {
 	frpcMeta, err := config.GetFrpcMetaFromAdmin(cfg.FrpAdminHost, cfg.AuthUser, cfg.AuthToken)
 	if err != nil {
-		return nil, err
+		return nil, msg.FrpcMeta{}, err
 	}
 	remoteProxiesConfig := make(map[string]config.ProxyConf)
 	for _, proxy := range frpcMeta.Proxies {
@@ -202,7 +203,7 @@ func getProxiesFromAdmin(cfg config.ClientCommonConf) (map[string]config.ProxyCo
 		proxyConf.UnmarshalFromAdmin(cfg, proxy)
 		remoteProxiesConfig[proxyName] = proxyConf
 	}
-	return remoteProxiesConfig, nil
+	return remoteProxiesConfig, frpcMeta, nil
 }
 
 func runClient(cfgFilePath string) error {
@@ -210,11 +211,14 @@ func runClient(cfgFilePath string) error {
 	if err != nil {
 		return err
 	}
-	remoteProxiesConfig, err := getProxiesFromAdmin(cfg)
+	remoteProxiesConfig, frpcMeta, err := getProxiesFromAdmin(cfg)
 	if err != nil {
 		return err
 	}
+	cfg.ServerAddr = frpcMeta.Frps.Ip
+	cfg.ServerPort = frpcMeta.Frps.Port
 	return startService(cfg, remoteProxiesConfig, visitorCfgs, cfgFilePath)
+
 }
 
 func startService(
@@ -243,18 +247,21 @@ func startService(
 		go handleSignal(svr, closedDoneCh)
 	}
 
-	err = svr.Run()
-
-	ticker := time.NewTicker(5 * time.Second)
-	for range ticker.C {
-		go func() {
-			remoteProxiesConfig, err := getProxiesFromAdmin(cfg)
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	go func(svr *client.Service) {
+		ticker := time.NewTicker(5 * time.Second)
+		for range ticker.C {
+			wg.Wait()
+			remoteProxiesConfig, _, err := getProxiesFromAdmin(cfg)
 			if err != nil {
 				fmt.Println(err)
 			}
 			svr.ReloadConf(remoteProxiesConfig, visitorCfgs)
-		}()
-	}
+		}
+	}(svr)
+
+	err = svr.Run(wg)
 
 	if err == nil && shouldGracefulClose {
 		<-closedDoneCh
