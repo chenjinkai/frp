@@ -250,7 +250,7 @@ func startService(
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go func(svr *client.Service) {
-		ticker := time.NewTicker(5 * time.Second)
+		ticker := time.NewTicker(60 * time.Second)
 		for range ticker.C {
 			wg.Wait()
 			remoteProxiesConfig, _, err := getProxiesFromAdmin(cfg)
