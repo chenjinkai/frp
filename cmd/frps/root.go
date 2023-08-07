@@ -203,16 +203,16 @@ func runServer(cfg config.ServerCommonConf) (err error) {
 	log.InitLog(cfg.LogWay, cfg.LogFile, cfg.LogLevel, cfg.LogMaxDays, cfg.DisableLogColor)
 
 	if cfgFile != "" {
-		log.Info("frps uses config file: %s", cfgFile)
+		log.Info(util.GetFrpsLogLabel()+"frps uses config file: %s", cfgFile)
 	} else {
-		log.Info("frps uses command line arguments for config")
+		log.Info(util.GetFrpsLogLabel() + "frps uses command line arguments for config")
 	}
 
 	svr, err := server.NewService(cfg)
 	if err != nil {
 		return err
 	}
-	log.Info("frps started successfully")
+	log.Info(util.GetFrpsLogLabel() + "frps started successfully")
 	svr.Run()
 	return
 }

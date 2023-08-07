@@ -197,7 +197,7 @@ func NewService(cfg config.ServerCommonConf) (svr *Service, err error) {
 	ln = svr.muxer.DefaultListener()
 
 	svr.listener = ln
-	log.Info("frps tcp listen on %s", address)
+	log.Info(util.GetFrpsLogLabel()+"frps tcp listen on %s", address)
 
 	// Listen for accepting connections from client using kcp protocol.
 	if cfg.KCPBindPort > 0 {
@@ -258,7 +258,7 @@ func NewService(cfg config.ServerCommonConf) (svr *Service, err error) {
 		go func() {
 			_ = server.Serve(l)
 		}()
-		log.Info("http service listen on %s", address)
+		log.Info(util.GetFrpsLogLabel()+"http service listen on %s", address)
 	}
 
 	// Create https vhost muxer.
@@ -273,7 +273,7 @@ func NewService(cfg config.ServerCommonConf) (svr *Service, err error) {
 				err = fmt.Errorf("create server listener error, %v", err)
 				return
 			}
-			log.Info("https service listen on %s", address)
+			log.Info(util.GetFrpsLogLabel()+"https service listen on %s", address)
 		}
 
 		svr.rc.VhostHTTPSMuxer, err = vhost.NewHTTPSMuxer(l, vhostReadWriteTimeout)
@@ -314,7 +314,7 @@ func NewService(cfg config.ServerCommonConf) (svr *Service, err error) {
 			err = fmt.Errorf("create dashboard web server error, %v", err)
 			return
 		}
-		log.Info("Dashboard listen on %s", address)
+		log.Info(util.GetFrpsLogLabel()+"Dashboard listen on %s", address)
 		statsEnable = true
 	}
 	if statsEnable {

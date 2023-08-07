@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -45,4 +46,13 @@ func TestParseRangeNumbers(t *testing.T) {
 
 	_, err = ParseRangeNumbers("3-a")
 	assert.Error(err)
+}
+
+func TestGetLocalIP(t *testing.T) {
+	localIP, err := GetLocalIP()
+	if err != nil {
+		t.Error()
+		return
+	}
+	fmt.Println("Local IP:", localIP)
 }

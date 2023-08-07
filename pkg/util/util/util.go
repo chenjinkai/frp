@@ -126,3 +126,57 @@ func RandomSleep(duration time.Duration, minRatio, maxRatio float64) time.Durati
 	time.Sleep(d)
 	return d
 }
+
+func GetLocalIP() (string, error) {
+	// Get all network interfaces available on the machine
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		return "", err
+	}
+
+	// Iterate through each network interface to find the local IP address
+	for _, iface := range interfaces {
+		// Skip loopback and non-up interfaces
+		if iface.Flags&net.FlagLoopback != 0 || iface.Flags&net.FlagUp == 0 {
+			continue
+		}
+
+		// Get all addresses of the current interface
+		addrs, err := iface.Addrs()
+		if err != nil {
+			return "", err
+		}
+
+		// Iterate through each address and check if it's an IP address
+		for _, addr := range addrs {
+			ip, _, err := net.ParseCIDR(addr.String())
+			if err != nil {
+				continue // Skip if it's not an IP address
+			}
+
+			// Check if the IP is an IPv4 address (change to net.IPv6 if you want IPv6)
+			if ip.To4() != nil {
+				return ip.String(), nil // Return the first IPv4 address found
+			}
+		}
+	}
+
+	return "", fmt.Errorf("local IP not found")
+}
+
+func GetLogLabel(component string) string {
+	templateStr := "[component=%s,ip=%s]"
+	localIp, err := GetLocalIP()
+	if err != nil {
+		return ""
+	}
+	return fmt.Sprintf(templateStr, component, localIp)
+}
+
+func GetFrpsLogLabel() string {
+	return GetLogLabel("frps")
+}
+
+func GetFrpcLogLabel() string {
+	return GetLogLabel("frpc")
+}
