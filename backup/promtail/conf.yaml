@@ -1,0 +1,24 @@
+server:
+  http_listen_port: 18080
+  grpc_listen_port: 18081
+
+positions:
+  filename: D://frp_logs//promtail//positions.yaml
+
+clients:
+  - url: https://600470:glc_eyJvIjoiODU5NDQwIiwibiI6InN0YWNrLTY0NzQyMy1obC1sb2NhbC10ZXN0IiwiayI6Ikd1QUZ5QlhYcWg2ZG82bjA2OTQ3MjY2cSIsIm0iOnsiciI6InByb2QtdXMtZWFzdC0wIn19@logs-prod-006.grafana.net/loki/api/v1/push
+
+scrape_configs:
+- job_name: frps
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: frpslog
+      __path__: D://frp_logs//frps.log
+  pipeline_stages:
+  - regex:
+      expression: '\[component=(?P<component>[^\]]+),ip=(?P<ip>[^\]]+)]'
+  - labels:
+      component:
+      ip:
