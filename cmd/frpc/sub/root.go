@@ -33,6 +33,7 @@ import (
 	"github.com/fatedier/frp/pkg/config"
 	"github.com/fatedier/frp/pkg/msg"
 	"github.com/fatedier/frp/pkg/util/log"
+	"github.com/fatedier/frp/pkg/util/util"
 	"github.com/fatedier/frp/pkg/util/version"
 )
 
@@ -193,6 +194,7 @@ func parseClientCommonCfgFromCmd() (cfg config.ClientCommonConf, err error) {
 }
 
 func getProxiesFromAdmin(cfg config.ClientCommonConf) (map[string]config.ProxyConf, msg.FrpcMeta, error) {
+	log.Info(util.GetFrpcLogLabel() + "start to get proxy from remote frp admin: " + cfg.FrpAdminHost)
 	frpcMeta, err := config.GetFrpcMetaFromAdmin(cfg.FrpAdminHost, cfg.AuthUser, cfg.AuthToken)
 	if err != nil {
 		return nil, msg.FrpcMeta{}, err
@@ -201,7 +203,8 @@ func getProxiesFromAdmin(cfg config.ClientCommonConf) (map[string]config.ProxyCo
 	for _, proxy := range frpcMeta.Proxies {
 		proxyConf := config.DefaultProxyConf(proxy.ProxyType)
 		proxyConf.UnmarshalFromAdmin(cfg, proxy)
-		remoteProxiesConfig[proxyName] = proxyConf
+		remoteProxiesConfig[proxyConf.GetBaseInfo().ProxyName] = proxyConf
+		log.Info(util.GetFrpcLogLabel() + "get proxy config from remote :" + proxyConf.GetBaseInfo().ProxyName)
 	}
 	return remoteProxiesConfig, frpcMeta, nil
 }
